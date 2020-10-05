@@ -18,8 +18,8 @@ def call(
   // Assign default containers and volumes for each type of deployment
   // Please bump version if you update containers or volumes
   private static final inPodMap = [
-    maven: [
-      version: "0.1.0",
+    java: [
+      version: "0.2.0",
       containers: [
         // Don't use alpine version. It having problem with forking JVM such as running surefire and junit testing
         // https://hub.docker.com/_/openjdk?tab=tags
@@ -34,14 +34,11 @@ def call(
         // https://hub.docker.com/r/lachlanevenson/k8s-kubectl/tags
         containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl:v1.16.4', ttyEnabled: true, command: 'cat'),
         // https://hub.docker.com/r/ppodgorsek/robot-framework/tags
-        containerTemplate(name: 'robot', image: 'ppodgorsek/robot-framework:3.5.0', ttyEnabled: true, command: 'cat')
+        containerTemplate(name: 'robot', image: 'ppodgorsek/robot-framework:3.5.0', ttyEnabled: true, command: 'cat'),
+        // https://hub.docker.com/r/alpine/git/tags
+        containerTemplate(name: 'git', image: 'alpine/git:1.0.7', ttyEnabled: true, command: 'cat')
       ],
       volumes: [
-        // Mount NFS as PVC for caching
-        persistentVolumeClaim(claimName: "nfs-${projectName}-jenkins-slave-dependency-check",
-          mountPath: '/home/jenkins/dependency-check-data'),
-        persistentVolumeClaim(claimName: "nfs-${projectName}-jenkins-slave-m2",
-          mountPath: '/root/.m2'),
         // Don't use NFS, It does not works well
         emptyDirVolume(mountPath: '/var/lib/docker')
       ]
